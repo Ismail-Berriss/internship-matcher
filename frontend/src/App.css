@@ -1,0 +1,346 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+#root {
+    width: 100%;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+        sans-serif;
+    background-color: #f8fafc;
+    color: #1e293b;
+    line-height: 1.6;
+}
+
+.app {
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    background: linear-gradient(
+        135deg,
+        #f0f9ff,
+        #e0f2fe
+    ); /* Subtle background gradient */
+}
+
+.container {
+    max-width: 700px;
+    width: 100%;
+}
+
+.title {
+    text-align: center;
+    font-size: 2.5rem; /* Slightly larger */
+    margin-bottom: 2rem;
+    color: #0f172a;
+    font-weight: 600; /* Bolder title */
+}
+
+.card {
+    background: white;
+    padding: 32px; /* Increased padding */
+    border-radius: 16px; /* Slightly more rounded */
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1); /* Stronger shadow */
+    transition: transform 0.2s, box-shadow 0.2s; /* Smooth transition */
+}
+
+.card:hover {
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15); /* Slightly stronger shadow on hover */
+    transform: translateY(-2px); /* Subtle lift on hover */
+}
+
+.error {
+    background: #fee2e2;
+    color: #b91c1c;
+    padding: 16px; /* Increased padding */
+    border-radius: 8px;
+    margin-bottom: 20px;
+    border-left: 4px solid #ef4444; /* Add a left border for visual emphasis */
+}
+
+.file-input {
+    display: block;
+    margin-bottom: 20px;
+    padding: 12px; /* Increased padding */
+    border: 2px dashed #cbd5e1; /* Dashed border for upload area */
+    border-radius: 8px;
+    width: 100%;
+    text-align: center; /* Center text inside input */
+    cursor: pointer; /* Indicate it's clickable */
+    transition: border-color 0.2s; /* Smooth border color transition */
+}
+
+.file-input:hover {
+    border-color: #94a3b8; /* Darker border on hover */
+}
+
+.btn {
+    padding: 12px 20px; /* Increased padding */
+    border: none;
+    border-radius: 8px; /* Slightly more rounded */
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.2s ease; /* Smooth transition for all properties */
+    font-weight: 500; /* Slightly bolder text */
+}
+
+.btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none !important; /* Override hover effect when disabled */
+}
+
+.btn-primary {
+    background-color: #3b82f6;
+    color: white;
+    width: 100%;
+}
+
+.btn-primary:hover:not(:disabled) {
+    background-color: #2563eb; /* Darker shade on hover */
+    transform: translateY(-1px); /* Slight lift on hover */
+}
+
+.btn-secondary {
+    flex: 1;
+    background-color: #e2e8f0;
+    color: #1e293b;
+}
+
+.btn-secondary:hover:not(:disabled) {
+    background-color: #cbd5e1; /* Darker shade on hover */
+    transform: translateY(-1px); /* Slight lift on hover */
+}
+
+.btn-success {
+    flex: 1;
+    background-color: #10b981;
+    color: white;
+}
+
+.btn-success:hover:not(:disabled) {
+    background-color: #059669; /* Darker shade on hover */
+    transform: translateY(-1px); /* Slight lift on hover */
+}
+
+.button-group {
+    display: flex;
+    gap: 16px; /* Increased gap */
+    margin-top: 24px; /* Increased top margin */
+}
+
+.field-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin: 16px 0;
+}
+
+.field-item {
+    display: flex;
+    align-items: center;
+    gap: 12px; /* Increased gap */
+    font-size: 1.1rem;
+    padding: 10px; /* Add padding */
+    border: 2px solid transparent; /* Initial transparent border */
+    border-radius: 6px; /* Add border radius */
+    cursor: pointer; /* Indicate it's clickable */
+    transition: all 0.2s; /* Smooth transition */
+}
+
+.field-item:hover {
+    background-color: #f1f5f9; /* Light background on hover */
+}
+
+.field-item.selected {
+    /* Style for the selected field */
+    background-color: #dbeafe;
+    border-color: #3b82f6;
+}
+
+.field-item input[type='radio'] {
+    cursor: pointer;
+}
+
+.job-list {
+    max-height: 60vh;
+    overflow-y: auto;
+    padding-right: 8px;
+    margin-top: 16px; /* Add space above the job list */
+}
+
+.job-card {
+    padding: 20px; /* Increased padding */
+    border: 1px solid #e2e8f0;
+    border-radius: 10px; /* More rounded */
+    margin-bottom: 16px;
+    background: #f8fafc;
+    transition: transform 0.2s, box-shadow 0.2s; /* Smooth transition */
+}
+
+.job-card:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* Shadow on hover */
+    transform: translateY(-1px); /* Slight lift on hover */
+}
+
+.job-card h3 {
+    font-size: 1.3rem; /* Slightly larger title */
+    margin-bottom: 8px; /* Increased bottom margin */
+    color: #0f172a;
+}
+
+.company {
+    font-weight: 600;
+    color: #334155;
+    margin-bottom: 6px; /* Increased bottom margin */
+}
+
+.location {
+    font-size: 0.95rem; /* Slightly larger font */
+    color: #64748b;
+    margin-bottom: 12px; /* Increased bottom margin */
+}
+
+.job-link {
+    color: #3b82f6;
+    text-decoration: none;
+    font-size: 1rem; /* Slightly larger font */
+    display: inline-block; /* Make it easier to style */
+    padding: 4px 8px; /* Add padding */
+    border-radius: 4px; /* Add border radius */
+    transition: background-color 0.2s; /* Smooth transition */
+}
+
+.job-link:hover {
+    text-decoration: underline;
+    background-color: #eff6ff; /* Light background on hover */
+}
+
+.header-with-reset {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.btn-link {
+    background: none;
+    border: none;
+    color: #3b82f6;
+    cursor: pointer;
+    font-size: 1rem;
+    padding: 8px 12px; /* Add padding */
+    border-radius: 6px; /* Add border radius */
+    transition: background-color 0.2s; /* Smooth transition */
+}
+
+.btn-link:hover {
+    background-color: #eff6ff; /* Light background on hover */
+    text-decoration: underline;
+}
+
+.location-select {
+    display: block;
+    width: 100%;
+    padding: 12px; /* Match file input padding */
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    font-size: 1rem;
+    background-color: white;
+    margin-bottom: 20px;
+    color: #1e293b; /* Ensure text color is readable */
+    cursor: pointer; /* Indicate it's clickable */
+    transition: border-color 0.2s; /* Smooth transition */
+}
+
+.location-select:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2); /* Thicker focus ring */
+}
+
+.section {
+    margin-bottom: 24px; /* Increased bottom margin */
+}
+
+.section h3 {
+    margin-bottom: 12px; /* Increased bottom margin */
+    font-size: 1.2rem; /* Slightly larger font */
+    color: #334155;
+    font-weight: 500; /* Slightly bolder */
+}
+
+/* --- New Styles for Loading Spinner --- */
+.spinner {
+    display: inline-flex; /* Use inline-flex to center dots */
+    align-items: center;
+    justify-content: center;
+    height: 1.2em; /* Match button text height */
+}
+
+.spinner-dot {
+    width: 0.4em;
+    height: 0.4em;
+    background-color: white; /* White dots for primary button */
+    border-radius: 50%;
+    margin: 0 0.1em; /* Space between dots */
+    display: inline-block;
+    animation: spinner-bounce 1.2s infinite ease-in-out both;
+}
+
+/* Adjust color for other buttons */
+.btn-secondary .spinner-dot {
+    background-color: #1e293b; /* Darker dots for secondary button */
+}
+
+.btn-success .spinner-dot {
+    background-color: white; /* White dots for success button */
+}
+
+@keyframes spinner-bounce {
+    0%,
+    80%,
+    100% {
+        transform: scale(0);
+    }
+    40% {
+        transform: scale(1);
+    }
+}
+
+.loading-jobs {
+    text-align: center;
+    padding: 20px 0; /* Add vertical padding */
+}
+
+.loading-jobs p {
+    margin-top: 10px; /* Space between spinner and text */
+    color: #64748b; /* Muted color for text */
+}
+/* --- End New Styles for Loading Spinner --- */
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .container {
+        padding: 10px;
+    }
+    .card {
+        padding: 24px;
+    }
+    .title {
+        font-size: 2rem;
+    }
+    .button-group {
+        flex-direction: column; /* Stack buttons vertically on small screens */
+        gap: 12px;
+    }
+    .btn {
+        width: 100%; /* Full width buttons on small screens */
+    }
+}
