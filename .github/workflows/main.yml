@@ -59,7 +59,7 @@ jobs:
                   aws-region: ${{ secrets.AWS_REGION }}
 
             - name: Login to Amazon ECR
-              id: ecr
+              id: login-ecr
               uses: aws-actions/amazon-ecr-login@v2
 
             - name: Build, Tag, and Push Backend Image
@@ -69,6 +69,6 @@ jobs:
                   ECR_REPOSITORY: $ {{ secrets.ECR_REPOSITORY_NAME }}
                   IMAGE_TAG: latest
               run: |
-                  docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG -f backend/ .
+                  docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG -f backend/Dockerfile .
                   docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
                   echo "::set-output name=image::$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
