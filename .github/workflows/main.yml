@@ -40,5 +40,11 @@ jobs:
             - name: Invalidate CloudFront Cache
               run: |
                   aws cloudfront create-invalidation \
-                  --distribution-id E2LLJNJY2HOCZX
-                  --paths "/*"
+                  --distribution-id ${{ CLOUDFRONT_DISTRIBUTION_ID }}
+                  --invalidate-batch '{
+                    "Paths": {
+                      "Quantity": 1,
+                      "Items": ["/*"]
+                    },
+                    "CallerReference": "github-action-invalidation-$(date +%s)"
+                  }'
