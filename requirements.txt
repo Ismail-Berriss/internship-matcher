@@ -1,12 +1,12 @@
 fastapi
-uvicorn
+uvicorn[standard]
 python-multipart
 PyPDF2
 python-docx
 google-generativeai
 python-dotenv
+pandas
 playwright
 selenium
 beautifulsoup4
-pandas
 webdriver-manager

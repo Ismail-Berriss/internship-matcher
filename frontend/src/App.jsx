@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import './App.css';
 
+const API_BASE = import.meta.env.VITE_API_BASE_URL || '';
+
 function App() {
     const [file, setFile] = useState(null);
     const [fields, setFields] = useState([]);
@@ -10,10 +12,45 @@ function App() {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
     const [location, setLocation] = useState(''); // Default to empty string for "All Locations"
+    const [isAnimating, setIsAnimating] = useState(false);
+    const [dragActive, setDragActive] = useState(false);
 
     // Step 1: Upload CV
     const handleFileChange = (e) => {
         setFile(e.target.files[0]);
+        setError('');
+    };
+
+    // Drag and drop handlers
+    const handleDrag = (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        if (e.type === 'dragenter' || e.type === 'dragover') {
+            setDragActive(true);
+        } else if (e.type === 'dragleave') {
+            setDragActive(false);
+        }
+    };
+
+    const handleDrop = (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        setDragActive(false);
+
+        if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+            const droppedFile = e.dataTransfer.files[0];
+            if (
+                droppedFile.type === 'application/pdf' ||
+                droppedFile.type ===
+                    'application/vnd.openxmlformats-officedocument.wordprocessingml.document' ||
+                droppedFile.type === 'application/msword'
+            ) {
+                setFile(droppedFile);
+                setError('');
+            } else {
+                setError('Please upload a PDF or DOCX file.');
+            }
+        }
     };
 
     const handleUpload = async () => {
@@ -27,9 +64,10 @@ function App() {
 
         setLoading(true);
         setError('');
+        setIsAnimating(true);
 
         try {
-            const res = await fetch('http://localhost:8000/upload-cv', {
+            const res = await fetch(`${API_BASE}/upload-cv`, {
                 method: 'POST',
                 body: formData,
             });
@@ -41,9 +79,13 @@ function App() {
 
             const data = await res.json();
             setFields(data.fields || []);
-            setStep(2);
+            setTimeout(() => {
+                setStep(2);
+                setIsAnimating(false);
+            }, 500);
         } catch (err) {
             setError(err.message || 'Upload failed');
+            setIsAnimating(false);
         } finally {
             setLoading(false);
         }
@@ -63,6 +105,7 @@ function App() {
 
         setLoading(true);
         setError('');
+        setIsAnimating(true);
 
         try {
             // Send the selected field as a single-item array to match backend expectation
@@ -73,14 +116,11 @@ function App() {
                 location: location,
             };
 
-            const res = await fetch(
-                'http://localhost:8000/scrape-internships',
-                {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(profile),
-                }
-            );
+            const res = await fetch(`${API_BASE}/scrape-internships`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(profile),
+            });
 
             if (!res.ok) {
                 const errorData = await res.json().catch(() => ({}));
@@ -91,22 +131,30 @@ function App() {
 
             const data = await res.json();
             setJobs(data.jobs || []);
-            setStep(3);
+            setTimeout(() => {
+                setStep(3);
+                setIsAnimating(false);
+            }, 500);
         } catch (err) {
             setError(err.message || 'Scraping failed');
+            setIsAnimating(false);
         } finally {
             setLoading(false);
         }
     };
 
     const reset = () => {
-        setFile(null);
-        setFields([]);
-        setSelectedField('');
-        setJobs([]);
-        setStep(1);
-        setError('');
-        setLocation('');
+        setIsAnimating(true);
+        setTimeout(() => {
+            setFile(null);
+            setFields([]);
+            setSelectedField('');
+            setJobs([]);
+            setStep(1);
+            setError('');
+            setLocation('');
+            setIsAnimating(false);
+        }, 300);
     };
 
     // Function to render a loading spinner
@@ -120,24 +168,71 @@ function App() {
 
     return (
         <div className="app">
-            <div className="container">
-                <h1 className="title">Internship Matcher 🎓</h1>
+            <div className={`container ${isAnimating ? 'animating' : ''}`}>
+                <h1 className="title">
+                    <span className="gradient-text">Internship Matcher</span>
+                    <span className="emoji">🎓</span>
+                </h1>
 
                 {error && <div className="error">{error}</div>}
 
                 {step === 1 && (
                     <div className="card">
                         <h2>Upload Your CV</h2>
-                        <input
-                            type="file"
-                            accept=".pdf,.docx,.doc"
-                            onChange={handleFileChange}
-                            className="file-input"
-                            disabled={loading} // Disable input while loading
-                        />
+                        <p className="card-description">
+                            Upload your CV to get personalized internship
+                            recommendations based on your skills and experience.
+                        </p>
+                        <div
+                            className={`file-input ${
+                                dragActive ? 'drag-active' : ''
+                            } ${file ? 'has-file' : ''}`}
+                            onDragEnter={handleDrag}
+                            onDragLeave={handleDrag}
+                            onDragOver={handleDrag}
+                            onDrop={handleDrop}
+                        >
+                            <input
+                                type="file"
+                                accept=".pdf,.docx,.doc"
+                                onChange={handleFileChange}
+                                disabled={loading}
+                                style={{ display: 'none' }}
+                                id="file-upload"
+                            />
+                            <label htmlFor="file-upload" className="file-label">
+                                {file ? (
+                                    <div className="file-info">
+                                        <span className="file-icon">✅</span>
+                                        <span className="file-name">
+                                            {file.name}
+                                        </span>
+                                        <span className="file-size">
+                                            (
+                                            {(file.size / 1024 / 1024).toFixed(
+                                                2
+                                            )}{' '}
+                                            MB)
+                                        </span>
+                                    </div>
+                                ) : (
+                                    <div className="file-placeholder">
+                                        <span className="upload-icon">📁</span>
+                                        <span className="upload-text">
+                                            {dragActive
+                                                ? 'Drop your CV here'
+                                                : 'Click to browse or drag & drop your CV'}
+                                        </span>
+                                        <span className="upload-hint">
+                                            PDF, DOCX up to 10MB
+                                        </span>
+                                    </div>
+                                )}
+                            </label>
+                        </div>
                         <button
                             onClick={handleUpload}
-                            disabled={loading}
+                            disabled={loading || !file}
                             className="btn btn-primary"
                         >
                             {loading ? renderSpinner() : 'Upload & Analyze'}
@@ -148,9 +243,10 @@ function App() {
                 {step === 2 && (
                     <div className="card">
                         <h2>Select Field & Location</h2>
-                        <p>
-                            We found these fields in your CV. Choose one. Also,
-                            select your preferred location.
+                        <p className="card-description">
+                            We found these fields in your CV. Choose your
+                            primary field and preferred location for
+                            internships.
                         </p>
 
                         {/* Field Selection Section - Now using Radio Buttons */}
@@ -174,7 +270,11 @@ function App() {
                                                 handleFieldChange(field)
                                             }
                                         />
-                                        <span>{field}</span>
+                                        <span className="field-content">
+                                            <span className="field-name">
+                                                {field}
+                                            </span>
+                                        </span>
                                     </label>
                                 ))}
                             </div>
@@ -187,11 +287,11 @@ function App() {
                                 value={location}
                                 onChange={(e) => setLocation(e.target.value)}
                                 className="location-select"
-                                disabled={loading} // Disable select while loading
+                                disabled={loading}
                             >
-                                <option value="">All Locations</option>
-                                <option value="Morocco">Morocco</option>
-                                <option value="France">France</option>
+                                <option value="">🌐 All Locations</option>
+                                <option value="Morocco">🇲🇦 Morocco</option>
+                                <option value="France">🇫🇷 France</option>
                             </select>
                         </div>
 
@@ -199,7 +299,7 @@ function App() {
                             <button
                                 onClick={() => setStep(1)}
                                 className="btn btn-secondary"
-                                disabled={loading} // Disable back button while loading
+                                disabled={loading}
                             >
                                 Back
                             </button>
@@ -219,31 +319,50 @@ function App() {
                         <div className="header-with-reset">
                             <h2>Found {jobs.length} Internships</h2>
                             <button onClick={reset} className="btn-link">
-                                Start Over
+                                🔄 Start Over
                             </button>
                         </div>
 
                         {loading ? ( // Show spinner while loading jobs
                             <div className="loading-jobs">
                                 {renderSpinner()}
-                                <p>Loading job results...</p>
+                                <p>Searching for the best internships...</p>
                             </div>
                         ) : jobs.length === 0 ? (
-                            <p>
-                                No internships found for "{selectedField}" in "
-                                {location || 'All Locations'}". Try a different
-                                field or location.
-                            </p>
+                            <div className="no-results">
+                                <h3>No Internships Found</h3>
+                                <p>
+                                    We couldn't find any internships for "
+                                    <strong>{selectedField}</strong>" in "
+                                    <strong>
+                                        {location || 'All Locations'}
+                                    </strong>
+                                    ".
+                                </p>
+                                <p>
+                                    Try adjusting your field or location
+                                    preferences.
+                                </p>
+                            </div>
                         ) : (
                             <div className="job-list">
                                 {jobs.map((job, idx) => (
                                     <div key={idx} className="job-card">
-                                        <h3>{job.title}</h3>
-                                        <p className="company">{job.company}</p>
+                                        <div className="job-header">
+                                            <h3>{job.title}</h3>
+                                            <div className="job-badge">New</div>
+                                        </div>
+                                        <p className="company">
+                                            <span className="company-icon">
+                                                🏢
+                                            </span>
+                                            {job.company}
+                                        </p>
                                         <p className="location">
-                                            {job.location ||
-                                                'Location not specified'}{' '}
-                                            • {job.source}
+                                            {job.location || 'Remote'} •{' '}
+                                            {job.source == 'wttj'
+                                                ? 'Welcome To The Jungle'
+                                                : 'LinkedIn'}
                                         </p>
                                         <a
                                             href={job.url}
@@ -251,7 +370,7 @@ function App() {
                                             rel="noopener noreferrer"
                                             className="job-link"
                                         >
-                                            View Job →
+                                            Apply Now
                                         </a>
                                     </div>
                                 ))}

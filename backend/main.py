@@ -27,7 +27,7 @@ app = FastAPI(title="Internship Matcher")
 # Allow frontend to call this API during dev
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173"],  # Vite default
+    allow_origins=["http://localhost:5173", "http://localhost:3000"],  # Vite default
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -155,6 +155,11 @@ async def upload_cv(file: UploadFile = File(...)):
 def scrape_endpoint(profile: ProfileResponse):
     jobs = scrape_internships(profile.field, profile.location)
     return {"count": len(jobs), "jobs": jobs}
+
+
+@app.get("/health")
+async def health_check():
+    return {"status": "healthy"}
 
 
 if __name__ == "__main__":
